@@ -35,7 +35,7 @@ void _sssed_cycle(u32 Reg0[_SSSED_KEYSTREAM_SIZE / 4], u32 Reg1[_SSSED_KEYSTREAM
     }
 }
 
-/// @brief       Simple.Symetric.Stream.Encrypt.Decrypt Cipher
+/// @brief       Simple.Symmetric.Stream.Encrypt.Decrypt Cipher
 /// @param Data  Pointer To Data To Cipher
 /// @param Size  Size Of Data To Cipher
 /// @param Key   Pointer To Key
@@ -75,6 +75,9 @@ void _sssed_cipher(u8* const __restrict Data, const u64 Size, const u32 Key[_SSS
         {   // Cycle
             for(u64 Cycle = 0; Cycle < _SSSED_TOTAL_CYCLES; ++Cycle)
                 _sssed_cycle(&Keystream[0],  &Keystream[_SSSED_KEYSTREAM_SIZE / 4],  &Keystream[_SSSED_KEYSTREAM_SIZE / 2],  &Keystream[_SSSED_KEYSTREAM_SIZE - (_SSSED_KEYSTREAM_SIZE / 4)]);
+            // Add Constant Keystream To Keystream
+            for(u32 i = 0; i < _SSSED_KEYSTREAM_SIZE; ++i)
+                Keystream[i] += ConstantKeystream[i];
         }
         // Xor Data By Keystream
         for(u64 Byte = 0; Byte < ChunkSize; ++Byte)
