@@ -16,19 +16,19 @@ typedef char       i8; typedef unsigned char       u8; typedef signed char      
 /// @brief Applies Addition, Xor By Rotation, & Add Over 4 Data Regions
 void _sssed_cycle(u32 Reg0[_SSSED_KEYSTREAM_SIZE / 4], u32 Reg1[_SSSED_KEYSTREAM_SIZE / 4], u32 Reg2[_SSSED_KEYSTREAM_SIZE / 4], u32 Reg3[_SSSED_KEYSTREAM_SIZE / 4]){
     for(u32 i = 0; i < _SSSED_KEYSTREAM_SIZE / 4; ++i){
-        // First 128-Bit Segment
+        // First Segment
         Reg0[i] += Reg2[i];
         Reg0[i] ^= (Reg3[i] >> 19) | (Reg3[i] << (32 - 19));
         Reg0[i] += Reg1[i];
-        // Second 128-Bit Segment
+        // Second Segment
         Reg1[i] += Reg3[i];
         Reg1[i] ^= (Reg0[i] >> 17) | (Reg0[i] << (32 - 17));
         Reg1[i] += Reg2[i];
-        // Third 128-Bit Segment
+        // Third Segment
         Reg2[i] += Reg0[i];
         Reg2[i] ^= (Reg1[i] >> 13) | (Reg1[i] << (32 - 13));
         Reg2[i] += Reg3[i];
-        // Fourth 128-Bit Segment
+        // Fourth Segment
         Reg3[i] += Reg1[i];
         Reg3[i] ^= (Reg2[i] >> 7) | (Reg2[i] << (32 - 7));
         Reg3[i] += Reg0[i];
