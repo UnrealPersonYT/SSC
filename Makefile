@@ -1,5 +1,5 @@
 # Target executable
-TARGET = sssed_test.exe
+TARGET = ssc_test.exe
 SRC = src/test.c
 
 # Default to GCC
