@@ -24,19 +24,19 @@ namespace ssc{
         u8* TestData = (u8*)calloc(Size, 1);
         // End Allocation
         End = clock();
-        printf("Allocation Time Taken(%llu *Clock Ticks*)\n", End - Start);
+        printf("Allocation Time Taken(%.3fs)\n", (f64)(End - Start) / CLOCKS_PER_SEC);
         // Start Encrytion
         Start = clock();
         _ssc32(TestData, Size, Key, Nonce);
         // End Encryption
         End = clock();
-        printf("Encryption Time Taken(%llu *Clock Ticks*)\nBytes Ciphered Per Tick(%.3f)\n", End - Start, (f64)Size / ((f64)End - (f64)Start));
+        printf("Encryption Time Taken(%.3fs)\nBytes Ciphered Per Second(%.3fgb/s)\n", (f64)(End - Start) / CLOCKS_PER_SEC, (f64)((f64)Size / ((f64)(End - Start) / CLOCKS_PER_SEC)) / (f64)(1ull << 30ull));
         // Start Decryption
         Start = clock();
         _ssc32(TestData, Size, Key, Nonce);
         // End Decryption
         End = clock();
-        printf("Decryption Time Taken(%llu *Clock Ticks*)\nBytes Ciphered Per Tick(%.3f)\n", End - Start, (f64)Size / ((f64)End - (f64)Start));
+        printf("Decryption Time Taken(%.3fs)\nBytes Ciphered Per Second(%.3fgb/s)\n", (f64)(End - Start) / CLOCKS_PER_SEC, (f64)((f64)Size / ((f64)(End - Start) / CLOCKS_PER_SEC)) / (f64)(1ull << 30ull));
         printf("Checking If Data Decrypted Correctly...\n");
         u8 Passed = 1;
         for(u64 Byte = 0; Byte < Size; ++Byte)
@@ -45,16 +45,16 @@ namespace ssc{
                 break;
             }
         if(Passed)
-            printf("✅ Success\n");
+            printf("Success\n");
         else
-            printf("❌ Failed\n");
+            printf("Failed\n");
         printf("Freeing Test Data\n");
         // Start Freeing
         Start = clock();
         free(TestData);
         // End Freeing
         End = clock();
-        printf("Freeing Time Taken(%llu *Clock Ticks*)\n", End - Start);
+        printf("Freeing Time Taken(%.3fs)\n", (f64)(End - Start) / CLOCKS_PER_SEC);
     }
 #ifdef __cplusplus
 } // namespace ssc
