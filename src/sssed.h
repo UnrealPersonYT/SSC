@@ -41,17 +41,13 @@ void _sssed_cycle(u32 Reg0[_SSSED_KEYSTREAM_SIZE / 4], u32 Reg1[_SSSED_KEYSTREAM
 /// @param Key   Pointer To Key
 /// @param Nonce Pointer To Nonce
 void _sssed_cipher(u8* const __restrict Data, const u64 Size, const u32 Key[_SSSED_KEYSIZE], const u32 Nonce[_SSSED_NONCE_SIZE]){
-    u32 ConstantKeystream[_SSSED_KEYSTREAM_SIZE]; // Constant Keystream
+    // Constants (Chosen For Uniform Bit Distribution & Hamming Distant)
+    u32 ConstantKeystream[_SSSED_KEYSTREAM_SIZE] = {0xDB4DA443, 0xB62B4963, 0xF256C239, 0x68475CA7}; // Constant Keystream
     {   // Initialize Keystream
         for(u32 i = 0; i < _SSSED_KEYSIZE; ++i)
-            ConstantKeystream[i] = Key[i];
+            ConstantKeystream[4 + i] = Key[i];
         for(u32 i = 0; i < _SSSED_NONCE_SIZE; ++i)
-            ConstantKeystream[_SSSED_KEYSIZE + i] = Nonce[i];
-        // Constants (Chosen Randomly May Change To Test (Must Be Non-Zero For Security))
-        ConstantKeystream[_SSSED_KEYSTREAM_SIZE - 4] = 0xF17A8B92;
-        ConstantKeystream[_SSSED_KEYSTREAM_SIZE - 3] = 0x6E9C4A8B;
-        ConstantKeystream[_SSSED_KEYSTREAM_SIZE - 2] = 0x3B29A39F;
-        ConstantKeystream[_SSSED_KEYSTREAM_SIZE - 1] = 0xE4A3BE2A;
+            ConstantKeystream[4 + _SSSED_KEYSIZE + i] = Nonce[i];
     }
     // Positional Keystream
     u32 Keystream[_SSSED_KEYSTREAM_SIZE];
