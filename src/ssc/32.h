@@ -1,7 +1,7 @@
 /// @file 32.h
 /// @brief 32-Bit Chunks Version
 #pragma once
-#include "stdint.h"
+#include "bop.h"
 
 #ifdef __cplusplus
 namespace ssc{
@@ -17,21 +17,21 @@ namespace ssc{
         // Apply Add, Xor By Rotate, Add To Each 32 Bit Lane In A 128-Bit Chunk
         for(u64 Lane = 0; Lane < 4; ++Lane){
             // First Chunk
-            Chunk0[Lane] += Chunk3[Lane];                                          // Add
-            Chunk0[Lane] ^= (Chunk2[Lane] >> 19u) | (Chunk2[Lane] << (32u - 19u)); // Xor By Rotate
-            Chunk0[Lane] += Chunk1[Lane];                                          // Add
+            Chunk0[Lane] += Chunk1[Lane];             // Add
+            Chunk0[Lane] ^= ror32(Chunk3[Lane], 17u); // Xor By Rotate
+            Chunk0[Lane] += Chunk2[Lane];             // Add
             // Second Chunk
-            Chunk1[Lane] += Chunk0[Lane];                                          // Add
-            Chunk1[Lane] ^= (Chunk1[Lane] >> 17u) | (Chunk1[Lane] << (32u - 17u)); // Xor By Rotate
-            Chunk1[Lane] += Chunk3[Lane];                                          // Add
+            Chunk1[Lane] += Chunk2[Lane];             // Add
+            Chunk1[Lane] ^= ror32(Chunk0[Lane], 13u); // Xor By Rotate
+            Chunk1[Lane] += Chunk3[Lane];             // Add
             // Third Chunk
-            Chunk2[Lane] += Chunk1[Lane];                                          // Add
-            Chunk2[Lane] ^= (Chunk3[Lane] >> 13u) | (Chunk3[Lane] << (32u - 13u)); // Xor By Rotate
-            Chunk2[Lane] += Chunk0[Lane];                                          // Add
+            Chunk2[Lane] += Chunk3[Lane];             // Add
+            Chunk2[Lane] ^= ror32(Chunk1[Lane], 11u); // Xor By Rotate
+            Chunk2[Lane] += Chunk0[Lane];             // Add
             // Fourth Chunk
-            Chunk3[Lane] += Chunk2[Lane];                                          // Add
-            Chunk3[Lane] ^= (Chunk0[Lane] >> 7u)  | (Chunk0[Lane] << (32u - 7u));  // Xor By Rotate
-            Chunk3[Lane] += Chunk2[Lane];                                          // Add
+            Chunk3[Lane] += Chunk0[Lane];             // Add
+            Chunk3[Lane] ^= ror32(Chunk2[Lane], 7u);  // Xor By Rotate
+            Chunk3[Lane] += Chunk1[Lane];             // Add
         }
     }
     /// @brief       Implementation Of Simple Stream Cipher-32
@@ -70,8 +70,8 @@ namespace ssc{
                     Counter[DWord] += 16u;
                 }
             }
-            // Do Rotations Of Internal Rotation
-            for(u64 Rotations = 4; Rotations--;)
+            // Do Rounds Of Internal Round
+            for(u64 Rounds = 4; Rounds--;)
                 _ssc32_rnd(&PosStream[0], &PosStream[4], &PosStream[8], &PosStream[12]);
             // Add BaseStream To Positional Stream
             for(u64 DWord = 0; DWord < 16; ++DWord)
