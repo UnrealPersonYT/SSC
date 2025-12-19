@@ -13,7 +13,7 @@ namespace ssc{
     /// @param Chunk1 128-Bit Chunk Consisting Of 4 32-Bit Lanes
     /// @param Chunk2 128-Bit Chunk Consisting Of 4 32-Bit Lanes
     /// @param Chunk3 128-Bit Chunk Consisting Of 4 32-Bit Lanes
-    void _ssc32_rnd(u32* const __restrict Chunk0, u32* const __restrict Chunk1, u32* const __restrict Chunk2, u32* const __restrict Chunk3){
+    __declspec(noinline) void _ssc32_rnd(u32* const __restrict Chunk0, u32* const __restrict Chunk1, u32* const __restrict Chunk2, u32* const __restrict Chunk3){
         // Apply Add, Xor By Rotate, Add To Each 32 Bit Lane In A 128-Bit Chunk
         for(u64 Lane = 0; Lane < 4; ++Lane){
             // First Chunk
