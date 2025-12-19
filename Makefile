@@ -4,7 +4,7 @@ SRC = src/benchmark.c
 
 # Default to GCC
 CC = gcc
-CFLAGS = -Wall -O3
+CFLAGS = -Wall -O3 -march=native -g
 OUTFLAG = -o
 
 # Detect OS
@@ -14,7 +14,7 @@ ifeq ($(OS),Windows_NT)
     # Check if gcc is available
     ifeq ($(shell where gcc >nul 2>nul && echo found),found)
         CC = gcc
-        CFLAGS = -Wall -O3 -g
+        CFLAGS = -Wall -O3 -march=native -g
         OUTFLAG = -o
     else
         CC = cl
@@ -26,7 +26,7 @@ else
     RM = rm -f
     ifeq ($(shell which gcc >/dev/null 2>&1 && echo found),found)
         CC = gcc
-        CFLAGS = -Wall -O3 -g
+        CFLAGS = -Wall -O3 -march=native -g
         OUTFLAG = -o
     else
         CC = cc
