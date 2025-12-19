@@ -7,7 +7,7 @@
 namespace ssc{
 #endif
     /// @brief Constants Chosen Based On Uniform Bit Distribution And Hamming Distance
-    #define _SSC_CONSTANTS (u32)0xDB4DA443, (u32)0xB62B4963, (u32)0xF256C239, (u32)0x68475CA7
+    #define _SSC_CONSTANTS (u32)0xA3F19C5E, (u64)0x5C8AE7B1, (u64)0x9E47D0A3, (u64)0x71B2F58C
     /// @brief        Simple Stream Cipher-32 Internal Round
     /// @param Chunk0 128-Bit Chunk Consisting Of 4 32-Bit Lanes
     /// @param Chunk1 128-Bit Chunk Consisting Of 4 32-Bit Lanes
@@ -40,18 +40,7 @@ namespace ssc{
     /// @param Key   Pointer To 256-Bit Key
     /// @param Nonce Pointer To 128-Bit Nonce
     void _ssc32(u8* const __restrict Data, const u64 Size, const u32* const __restrict Key, const u32* const __restrict Nonce){
-        u32 BaseStream[16] = {_SSC_CONSTANTS}; // 512-Bit Base Values
-        {   // Initialize Base Stream
-            // Load 256-Bit Key
-            for(u64 DWord = 0; DWord < 8; ++DWord)
-                BaseStream[DWord + 4] = Key[DWord];
-            // Load 128-Bit Nonce
-            for(u64 DWord = 0; DWord < 4; ++DWord)
-                BaseStream[DWord + 12] = Nonce[DWord];
-        }
-        // 512-Bit Counter
-        u32 Counter[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8,
-                           9, 10, 11, 12, 13, 14, 15};
+        u32 BaseStream[16] = {_SSC_CONSTANTS, Key[0], Key[1], Key[2], Key[3], Key[4], Key[5], Key[6], Key[7], Nonce[0], Nonce[1], Nonce[2], Nonce[3]}; // 512-Bit Base Values
         // Go Through Data As Index
         for(u64 Index = 0; Index < Size;){
             // Get Total Chunk
@@ -61,14 +50,12 @@ namespace ssc{
                 ChunkSize = 64;
             u32 PosStream[16]; // Positional 512-Bit Key Stream
             {   // Initialize Positional Stream
-                for(u64 DWord = 0; DWord < 16; ++DWord){
-                    // Load From Base Stream
+                for(u64 DWord = 0; DWord < 16; ++DWord)
+                    // Load From Base Stream + Index + Position In File
                     PosStream[DWord] = BaseStream[DWord];
-                    // Increment By Counter
-                    PosStream[DWord] += Counter[DWord];
-                    // Increment Counter
-                    Counter[DWord] += 16u;
-                }
+                for(u64 DWord = 0; DWord < 4; ++DWord)
+                    // Increment Constants
+                    BaseStream[DWord] += ChunkSize;
             }
             // Do Rounds Of Internal Round
             for(u64 Rounds = 4; Rounds--;)
