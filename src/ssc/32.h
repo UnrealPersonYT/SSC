@@ -8,36 +8,37 @@ namespace ssc{
 #endif
     /// @brief Constants Chosen Based On Uniform Bit Distribution And Hamming Distance
     #define _SSC_CONSTANTS (u32)0xA3F19C5E, (u64)0x5C8AE7B1, (u64)0x9E47D0A3, (u64)0x71B2F58C
+    /// @brief Total Rounds Per Call (Change For Test Purposes)
+    #define _SCC_ROUNDS 4
     /// @brief        Simple Stream Cipher-32 Internal Round
     /// @param Chunk0 128-Bit Chunk Consisting Of 4 32-Bit Lanes
     /// @param Chunk1 128-Bit Chunk Consisting Of 4 32-Bit Lanes
     /// @param Chunk2 128-Bit Chunk Consisting Of 4 32-Bit Lanes
     /// @param Chunk3 128-Bit Chunk Consisting Of 4 32-Bit Lanes
     void _ssc32_rnds(u32* const __restrict Chunk0, u32* const __restrict Chunk1, u32* const __restrict Chunk2, u32* const __restrict Chunk3){
-        // Turn Into Their Shuffled Forms
-        const u32 Chunk0S[4] = {Chunk0[2], Chunk0[0], Chunk0[3], Chunk0[1]};
-        const u32 Chunk1S[4] = {Chunk1[3], Chunk1[1], Chunk1[0], Chunk1[2]};
-        const u32 Chunk2S[4] = {Chunk2[1], Chunk2[3], Chunk2[0], Chunk2[2]};
-        const u32 Chunk3S[4] = {Chunk3[3], Chunk3[2], Chunk3[1], Chunk3[0]};
-        // Apply Add, Xor By Rotate, Add To Each 32 Bit Lane In A 128-Bit Chunk
-        for(u64 Lane = 0; Lane < 4; ++Lane){
-            for(u64 Rounds = 4; Rounds--;){  // Do Multiple Rounds
+        for(u64 Rounds = _SCC_ROUNDS; Rounds--;){  // Do Multiple Rounds
+            // Apply Add, Xor By Rotate, Add To Each 32 Bit Lane In A 128-Bit Chunk
+            for(u64 Lane = 0; Lane < 4; ++Lane){
                 // First Chunk
-                Chunk0[Lane] += Chunk1S[Lane];                       // Add
-                Chunk0[Lane] ^= ror32(Chunk3S[(Lane + 1) & 3], 17u); // Xor By Rotate
-                Chunk0[Lane] += Chunk2S[(Lane + 2) & 3];             // Add
+                Chunk0[Lane] += Chunk1[Lane];                       // Add
+                Chunk0[Lane] ^= ror32(Chunk3[(Lane + 1) & 3], 19u); // Xor By Rotate (Different Chunk)
+                Chunk0[Lane] += Chunk2[(Lane + 2) & 3];             // Add
+                Chunk0[Lane] ^= ror32(Chunk0[(Lane + 3) & 3], 7u);  // Xor By Rotate (Same Chunk)
                 // Second Chunk
-                Chunk1[Lane] += Chunk2S[Lane];                       // Add
-                Chunk1[Lane] ^= ror32(Chunk0S[(Lane + 1) & 3], 13u); // Xor By Rotate
-                Chunk1[Lane] += Chunk3S[(Lane + 2) & 3];             // Add
+                Chunk1[Lane] += Chunk2[Lane];                       // Add
+                Chunk1[Lane] ^= ror32(Chunk0[(Lane + 1) & 3], 17u); // Xor By Rotate (Different Chunk)
+                Chunk1[Lane] += Chunk3[(Lane + 2) & 3];             // Add
+                Chunk1[Lane] ^= ror32(Chunk1[(Lane + 3) & 3], 13u); // Xor By Rotate (Same Chunk)
                 // Third Chunk
-                Chunk2[Lane] += Chunk3S[Lane];                       // Add
-                Chunk2[Lane] ^= ror32(Chunk1S[(Lane + 1) & 3], 11u); // Xor By Rotate
-                Chunk2[Lane] += Chunk0S[(Lane + 2) & 3];             // Add
+                Chunk2[Lane] += Chunk3[Lane];                       // Add
+                Chunk2[Lane] ^= ror32(Chunk1[(Lane + 1) & 3], 13u); // Xor By Rotate (Different Chunk)
+                Chunk2[Lane] += Chunk0[(Lane + 2) & 3];             // Add
+                Chunk2[Lane] ^= ror32(Chunk2[(Lane + 3) & 3], 17u); // Xor By Rotate (Same Chunk)
                 // Fourth Chunk
-                Chunk3[Lane] += Chunk0S[Lane];                       // Add
-                Chunk3[Lane] ^= ror32(Chunk2S[(Lane + 1) & 3], 7u);  // Xor By Rotate
-                Chunk3[Lane] += Chunk1S[(Lane + 2) & 3];             // Add
+                Chunk3[Lane] += Chunk0[Lane];                       // Add
+                Chunk3[Lane] ^= ror32(Chunk2[(Lane + 1) & 3], 7u);  // Xor By Rotate
+                Chunk3[Lane] += Chunk1[(Lane + 2) & 3];             // Add
+                Chunk3[Lane] ^= ror32(Chunk3[(Lane + 3) & 3], 19u); // Xor By Rotate (Same Chunk)
             }
         }
     }
